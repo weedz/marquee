@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "esnext",
+        "strict": true,
+        "declaration": true,
+        "outDir": "dist"
+    },
+    "include": ["src"]
+}
