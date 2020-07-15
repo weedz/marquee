@@ -1,7 +1,7 @@
 import TextMarquee, { Direction } from "../src";
 
 test('default', async () => {
-    let buffer = "";
+    const frames: string[] = [];
     let stopAt = 5;
 
     const cb = jest.fn();
@@ -9,10 +9,11 @@ test('default', async () => {
     await new Promise((resolve, reject) => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
-            formatter: (msg: string) => {
-                buffer += msg;
+            render: (msg: string) => {
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
             }
@@ -21,11 +22,17 @@ test('default', async () => {
     });
 
     expect(cb).toHaveBeenCalledTimes(5);
-    expect(buffer).toEqual("ong     pong     ponng     pong     pongg     pong     pong      pong     pong      pong     pong   ");
+    expect(frames).toEqual([
+        "ong     pong     pon",
+        "ng     pong     pong",
+        "g     pong     pong ",
+        "     pong     pong  ",
+        "    pong     pong   ",
+    ]);
 }, 500);
 
 test('direction right', async () => {
-    let buffer = "";
+    const frames: string[] = [];
     let stopAt = 5;
 
     const cb = jest.fn();
@@ -34,10 +41,11 @@ test('direction right', async () => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
             direction: Direction.Right,
-            formatter: (msg: string) => {
-                buffer += msg;
+            render: (msg: string) => {
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
             }
@@ -46,11 +54,18 @@ test('direction right', async () => {
     });
 
     expect(cb).toHaveBeenCalledTimes(5);
-    expect(buffer).toEqual("   pong     pong        pong     pong        pong     pong  g     pong     pong ng     pong     pong");
+    expect(frames).toEqual([
+        "   pong     pong    ",
+        "    pong     pong   ",
+        "     pong     pong  ",
+        "g     pong     pong ",
+        "ng     pong     pong",
+    ]);
 }, 500);
 
 test('change direction', async () => {
     let buffer = "";
+    const frames: string[] = [];
     let stopAt = 10;
 
     const cb = jest.fn();
@@ -58,8 +73,9 @@ test('change direction', async () => {
     await new Promise((resolve, reject) => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
-            formatter: (msg: string) => {
+            render: (msg: string) => {
                 buffer += msg;
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() === 3) {
                     marquee.direction = Direction.Right;
@@ -68,6 +84,7 @@ test('change direction', async () => {
                     marquee.direction = Direction.Left;
                 }
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
             }
@@ -76,11 +93,22 @@ test('change direction', async () => {
     });
 
     expect(cb).toHaveBeenCalledTimes(10);
-    expect(buffer).toEqual("ong     pong     ponng     pong     pongg     pong     pong pong     pong     po pong     pong     p  pong     pong        pong     pong    pong     pong     poong     pong     ponng     pong     pong");
+    expect(frames).toEqual([
+        "ong     pong     pon",
+        "ng     pong     pong",
+        "g     pong     pong ",
+        "pong     pong     po",
+        " pong     pong     p",
+        "  pong     pong     ",
+        "   pong     pong    ",
+        "pong     pong     po",
+        "ong     pong     pon",
+        "ng     pong     pong",
+    ]);
 }, 500);
 
 test('change text', async () => {
-    let buffer = "";
+    const frames: string[] = [];
     let stopAt = 10;
 
     const cb = jest.fn();
@@ -88,13 +116,14 @@ test('change text', async () => {
     await new Promise((resolve, reject) => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
-            formatter: (msg: string) => {
-                buffer += msg;
+            render: (msg: string) => {
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() === 3) {
                     marquee.updateString("PONG");
                 }
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
             }
@@ -103,11 +132,22 @@ test('change text', async () => {
     });
 
     expect(cb).toHaveBeenCalledTimes(10);
-    expect(buffer).toEqual("ong     pong     ponng     pong     pongg     pong     pong      pong     pong P    pong     pong PO   pong     pong PON  pong     pong PONG pong     pong PONG pong     pong PONG  ong     pong PONG   ");
+    expect(frames).toEqual([
+        "ong     pong     pon",
+        "ng     pong     pong",
+        "g     pong     pong ",
+        "     pong     pong P",
+        "    pong     pong PO",
+        "   pong     pong PON",
+        "  pong     pong PONG",
+        " pong     pong PONG ",
+        "pong     pong PONG  ",
+        "ong     pong PONG   ",
+    ]);
 }, 500);
 
 test('change text, direction right', async () => {
-    let buffer = "";
+    const frames: string[] = [];
     let stopAt = 10;
 
     const cb = jest.fn();
@@ -116,13 +156,14 @@ test('change text, direction right', async () => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
             direction: Direction.Right,
-            formatter: (msg: string) => {
-                buffer += msg;
+            render: (msg: string) => {
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() === 3) {
                     marquee.updateString("PONG");
                 }
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
             }
@@ -131,11 +172,22 @@ test('change text, direction right', async () => {
     });
 
     expect(cb).toHaveBeenCalledTimes(10);
-    expect(buffer).toEqual("   pong     pong        pong     pong        pong     pong        pong     pong        pong     pong        pong     pon         pong     po          pong     pG          pong     NG          pong    ");
+    expect(frames).toEqual([
+        "   pong     pong    ",
+        "    pong     pong   ",
+        "     pong     pong  ",
+        "      pong     pong ",
+        "       pong     pong",
+        "        pong     pon",
+        "         pong     po",
+        "          pong     p",
+        "G          pong     ",
+        "NG          pong    ",
+    ]);
 }, 500);
 
 test('slow scroll', async () => {
-    let buffer = "";
+    const frames: string[] = [];
     let stopAt = 5;
 
     const cb = jest.fn();
@@ -144,10 +196,11 @@ test('slow scroll', async () => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
             scrollAmount: .3,   // this does not change the output but be formatter should still be called just 5 times
-            formatter: (msg: string) => {
-                buffer += msg;
+            render: (msg: string) => {
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
             }
@@ -156,22 +209,31 @@ test('slow scroll', async () => {
     });
 
     expect(cb).toHaveBeenCalledTimes(5);
-    expect(buffer).toEqual("ong     pong     ponng     pong     pongg     pong     pong      pong     pong      pong     pong   ");
+    expect(frames).toEqual([
+        "ong     pong     pon",
+        "ng     pong     pong",
+        "g     pong     pong ",
+        "     pong     pong  ",
+        "    pong     pong   ",
+    ]);
 }, 500);
 
 test('start/stop', async () => {
-    let buffer = "";
+    const frames: string[] = [];
     let stopAt = 5;
 
     const cb = jest.fn();
 
+    const start = process.hrtime.bigint();
+
     await new Promise((resolve, reject) => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
-            formatter: (msg: string) => {
-                buffer += msg;
+            render: (msg: string) => {
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
                 if (marquee.ticks() === 3) {
@@ -186,23 +248,36 @@ test('start/stop', async () => {
         marquee.start();
     });
 
-    expect(cb).toHaveBeenCalledTimes(6);
-    expect(buffer).toEqual("ong     pong     ponng     pong     pongg     pong     pong      pong     pong      pong     pong   ");
-}, 500);
+    if (process.hrtime.bigint() - start < 150) {
+        throw "Did not stop.";
+    }
 
-test('start/stop', async () => {
-    let buffer = "";
+    expect(cb).toHaveBeenCalledTimes(6);
+    expect(frames).toEqual([
+        "ong     pong     pon",
+        "ng     pong     pong",
+        "g     pong     pong ",
+        "     pong     pong  ",
+        "    pong     pong   ",
+    ]);
+}, 5000);
+
+test('change interval', async () => {
+    const frames: string[] = [];
     let stopAt = 5;
 
     const cb = jest.fn();
 
+    const start = process.hrtime.bigint();
+
     await new Promise((resolve, reject) => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
-            formatter: (msg: string) => {
-                buffer += msg;
+            render: (msg: string) => {
+                frames.push(msg);
                 cb();
                 if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
                     resolve();
                 }
                 if (marquee.ticks() === 3) {
@@ -213,6 +288,16 @@ test('start/stop', async () => {
         marquee.start();
     });
 
+    if (process.hrtime.bigint() - start < 130) {
+        throw "Did not stop.";
+    }
+
     expect(cb).toHaveBeenCalledTimes(5);
-    expect(buffer).toEqual("ong     pong     ponng     pong     pongg     pong     pong      pong     pong      pong     pong   ");
+    expect(frames).toEqual([
+        "ong     pong     pon",
+        "ng     pong     pong",
+        "g     pong     pong ",
+        "     pong     pong  ",
+        "    pong     pong   ",
+    ]);
 }, 2000);

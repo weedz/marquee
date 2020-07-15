@@ -4,13 +4,13 @@ export enum Direction {
 }
 
 export default class TextMarquee {
-    private size: number;
+    private viewSize: number;
     private padding: number;
     private padStr: string;
     private str: string = "";
     public direction: Direction;
 
-    private formatter: Function;
+    private renderer: Function;
     private updateInterval: number;
     public scrollAmount: number;
 
@@ -19,16 +19,16 @@ export default class TextMarquee {
     private emptyBuffer: number = 0;
     private timeout?: NodeJS.Timeout;
 
-    constructor(str: string, { size = 20, padding = 5, padStr = " ", direction = Direction.Left, formatter, updateInterval = 200, scrollAmount = 1 }: {
-        size?: number;
+    constructor(str: string, { viewSize: viewSize = 20, padding = 5, padStr = " ", direction = Direction.Left, render: renderer, updateInterval = 200, scrollAmount = 1 }: {
+        viewSize?: number;
         padding?: number;
         padStr?: string;
         direction?: Direction;
         updateInterval?: number;
         scrollAmount?: number;
-        formatter?: (buffer: string) => void;
+        render?: (buffer: string) => void;
     }) {
-        this.size = size;
+        this.viewSize = viewSize;
         this.padding = padding;
         this.padStr = padStr;
         this.direction = direction
@@ -38,7 +38,7 @@ export default class TextMarquee {
 
         this.setString(str);
 
-        this.formatter = formatter || ((str: string) => {
+        this.renderer = renderer || ((str: string) => {
             const stream = process.stdout;
             stream.cursorTo(0, stream.rows);
             stream.clearLine(0);
@@ -81,7 +81,7 @@ export default class TextMarquee {
             this.buffer = append + this.buffer;
         }
 
-        this.formatter(this.substring(0, this.size));
+        this.renderer(this.substring(0, this.viewSize));
     }
 
     private substring(start: number, end?: number) {
@@ -116,17 +116,17 @@ export default class TextMarquee {
     setString(str: string) {
         this.str = str;
         const tmp = (this.str + this.padStr.repeat(this.padding));
-        this.buffer = tmp.repeat(Math.ceil(this.size / tmp.length));
+        this.buffer = tmp.repeat(Math.ceil(this.viewSize / tmp.length));
     }
     updateString(str: string) {
         this.str = str;
-        this.buffer = this.substring(0, this.size);
+        this.buffer = this.substring(0, this.viewSize);
         this.emptyBuffer = this.buffer.length;
         const tmp = (this.str + this.padStr.repeat(this.padding));
         if (this.direction === Direction.Left) {
-            this.buffer += tmp.repeat(Math.ceil(this.size / tmp.length));
+            this.buffer += tmp.repeat(Math.ceil(this.viewSize / tmp.length));
         } else {
-            this.buffer = tmp.repeat(Math.ceil(this.size / tmp.length)) + this.buffer;
+            this.buffer = tmp.repeat(Math.ceil(this.viewSize / tmp.length)) + this.buffer;
         }
     }
 }

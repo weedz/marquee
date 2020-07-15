@@ -3,12 +3,12 @@ import TextMarquee, { Direction } from "../src";
 process.stdout.write("\n\n\n");
 const marquees = [
     new TextMarquee("Hello World!", {
-        size: 80,
+        viewSize: 80,
         updateInterval: 100,
         padStr: " >---< ",
         padding: 1,
         scrollAmount: 3,
-        formatter: (msg:string) => {
+        render: (msg:string) => {
             process.stdout.cursorTo(0, process.stdout.rows - 2);
             process.stdout.clearLine(0);
             process.stdout.write(msg);
@@ -16,11 +16,11 @@ const marquees = [
         }
     }),
     new TextMarquee("Ping", {
-        size: 40,
+        viewSize: 40,
         padding: 1,
         updateInterval: 50,
         scrollAmount: 1,
-        formatter: (msg:string) => {
+        render: (msg:string) => {
             process.stdout.cursorTo(0, process.stdout.rows - 3);
             process.stdout.clearLine(0);
             process.stdout.write(" ".repeat(20) + msg);
@@ -28,12 +28,12 @@ const marquees = [
         }
     }),
     new TextMarquee("pong", {
-        size: 40,
+        viewSize: 40,
         padding: 1,
         updateInterval: 500,
         scrollAmount: 1,
         direction: Direction.Right,
-        formatter: (msg:string) => {
+        render: (msg:string) => {
             process.stdout.cursorTo(0, process.stdout.rows);
             process.stdout.clearLine(0);
             process.stdout.write(" ".repeat(20) + msg);
