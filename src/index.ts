@@ -3,6 +3,14 @@ export enum Direction {
     Right
 }
 
+export function defaultRenderer(msg: string) {
+    const stream = process.stdout;
+    stream.cursorTo(0, stream.rows);
+    stream.clearLine(0);
+    stream.write(msg);
+    stream.cursorTo(0, stream.rows);
+}
+
 export default class TextMarquee {
     private viewSize: number;
     private padding: number;
@@ -10,7 +18,7 @@ export default class TextMarquee {
     private str: string = "";
     public direction: Direction;
 
-    private renderer: Function;
+    private renderer: (buffer: string) => void;
     private updateInterval: number;
     public scrollAmount: number;
 
@@ -19,14 +27,14 @@ export default class TextMarquee {
     private emptyBuffer: number = 0;
     private timeout?: NodeJS.Timeout;
 
-    constructor(str: string, { viewSize: viewSize = 20, padding = 5, padStr = " ", direction = Direction.Left, render: renderer, updateInterval = 200, scrollAmount = 1 }: {
-        viewSize?: number;
-        padding?: number;
-        padStr?: string;
-        direction?: Direction;
-        updateInterval?: number;
-        scrollAmount?: number;
-        render?: (buffer: string) => void;
+    constructor(str: string, {
+        viewSize: viewSize = 20,
+        padding = 5,
+        padStr = " ",
+        direction = Direction.Left,
+        render = defaultRenderer,
+        updateInterval = 200,
+        scrollAmount = 1
     }) {
         this.viewSize = viewSize;
         this.padding = padding;
@@ -38,13 +46,7 @@ export default class TextMarquee {
 
         this.setString(str);
 
-        this.renderer = renderer || ((str: string) => {
-            const stream = process.stdout;
-            stream.cursorTo(0, stream.rows);
-            stream.clearLine(0);
-            stream.write(str);
-            stream.cursorTo(0, stream.rows);
-        });
+        this.renderer = render;
     }
 
     ticks() {
