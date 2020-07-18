@@ -1,8 +1,9 @@
 import TextMarquee, { Direction } from "../src";
 
-test('default', async () => {
+test('short string', async () => {
+    // we "scroll" a string that is shorter than viewSize(20)
     const frames: string[] = [];
-    let stopAt = 5;
+    const stopAt = 5;
 
     const cb = jest.fn();
 
@@ -21,7 +22,7 @@ test('default', async () => {
         marquee.start();
     });
 
-    expect(cb).toHaveBeenCalledTimes(5);
+    expect(cb).toHaveBeenCalledTimes(stopAt);
     expect(frames).toEqual([
         "ong     pong     pon",
         "ng     pong     pong",
@@ -31,9 +32,46 @@ test('default', async () => {
     ]);
 }, 500);
 
+test('long string', async () => {
+    // we "scroll" a string that is longer than viewSize(20)
+    const frames: string[] = [];
+    const stopAt = 10;
+
+    const cb = jest.fn();
+
+    await new Promise((resolve, reject) => {
+        const marquee = new TextMarquee("Hello, World! Ping, ping, pong, Pong", {
+            updateInterval: 10,
+            render: (msg: string) => {
+                frames.push(msg);
+                cb();
+                if (marquee.ticks() >= stopAt) {
+                    marquee.stop();
+                    resolve();
+                }
+            }
+        });
+        marquee.start();
+    });
+
+    expect(cb).toHaveBeenCalledTimes(stopAt);
+    expect(frames).toEqual([
+        "ello, World! Ping, p",
+        "llo, World! Ping, pi",
+        "lo, World! Ping, pin",
+        "o, World! Ping, ping",
+        ", World! Ping, ping,",
+        " World! Ping, ping, ",
+        "World! Ping, ping, p",
+        "orld! Ping, ping, po",
+        "rld! Ping, ping, pon",
+        "ld! Ping, ping, pong",
+    ]);
+}, 500);
+
 test('direction right', async () => {
     const frames: string[] = [];
-    let stopAt = 5;
+    const stopAt = 5;
 
     const cb = jest.fn();
 
@@ -53,7 +91,7 @@ test('direction right', async () => {
         marquee.start();
     });
 
-    expect(cb).toHaveBeenCalledTimes(5);
+    expect(cb).toHaveBeenCalledTimes(stopAt);
     expect(frames).toEqual([
         "   pong     pong    ",
         "    pong     pong   ",
@@ -64,9 +102,8 @@ test('direction right', async () => {
 }, 500);
 
 test('change direction', async () => {
-    let buffer = "";
     const frames: string[] = [];
-    let stopAt = 10;
+    const stopAt = 10;
 
     const cb = jest.fn();
 
@@ -74,7 +111,6 @@ test('change direction', async () => {
         const marquee = new TextMarquee("pong", {
             updateInterval: 10,
             render: (msg: string) => {
-                buffer += msg;
                 frames.push(msg);
                 cb();
                 if (marquee.ticks() === 3) {
@@ -92,7 +128,7 @@ test('change direction', async () => {
         marquee.start();
     });
 
-    expect(cb).toHaveBeenCalledTimes(10);
+    expect(cb).toHaveBeenCalledTimes(stopAt);
     expect(frames).toEqual([
         "ong     pong     pon",
         "ng     pong     pong",
@@ -109,7 +145,7 @@ test('change direction', async () => {
 
 test('change text', async () => {
     const frames: string[] = [];
-    let stopAt = 10;
+    const stopAt = 10;
 
     const cb = jest.fn();
 
@@ -131,7 +167,7 @@ test('change text', async () => {
         marquee.start();
     });
 
-    expect(cb).toHaveBeenCalledTimes(10);
+    expect(cb).toHaveBeenCalledTimes(stopAt);
     expect(frames).toEqual([
         "ong     pong     pon",
         "ng     pong     pong",
@@ -148,7 +184,7 @@ test('change text', async () => {
 
 test('change text, direction right', async () => {
     const frames: string[] = [];
-    let stopAt = 10;
+    const stopAt = 10;
 
     const cb = jest.fn();
 
@@ -171,7 +207,7 @@ test('change text, direction right', async () => {
         marquee.start();
     });
 
-    expect(cb).toHaveBeenCalledTimes(10);
+    expect(cb).toHaveBeenCalledTimes(stopAt);
     expect(frames).toEqual([
         "   pong     pong    ",
         "    pong     pong   ",
@@ -188,7 +224,7 @@ test('change text, direction right', async () => {
 
 test('slow scroll', async () => {
     const frames: string[] = [];
-    let stopAt = 5;
+    const stopAt = 5;
 
     const cb = jest.fn();
 
@@ -208,7 +244,7 @@ test('slow scroll', async () => {
         marquee.start();
     });
 
-    expect(cb).toHaveBeenCalledTimes(5);
+    expect(cb).toHaveBeenCalledTimes(stopAt);
     expect(frames).toEqual([
         "ong     pong     pon",
         "ng     pong     pong",
@@ -220,7 +256,7 @@ test('slow scroll', async () => {
 
 test('start/stop', async () => {
     const frames: string[] = [];
-    let stopAt = 5;
+    const stopAt = 5;
 
     const cb = jest.fn();
 
@@ -252,7 +288,7 @@ test('start/stop', async () => {
         throw "Did not stop.";
     }
 
-    expect(cb).toHaveBeenCalledTimes(6);
+    expect(cb).toHaveBeenCalledTimes(stopAt + 1);
     expect(frames).toEqual([
         "ong     pong     pon",
         "ng     pong     pong",
@@ -264,7 +300,7 @@ test('start/stop', async () => {
 
 test('change interval', async () => {
     const frames: string[] = [];
-    let stopAt = 5;
+    const stopAt = 5;
 
     const cb = jest.fn();
 
@@ -292,7 +328,7 @@ test('change interval', async () => {
         throw "Did not stop.";
     }
 
-    expect(cb).toHaveBeenCalledTimes(5);
+    expect(cb).toHaveBeenCalledTimes(stopAt);
     expect(frames).toEqual([
         "ong     pong     pon",
         "ng     pong     pong",
